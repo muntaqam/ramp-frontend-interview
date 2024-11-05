@@ -1,36 +1,23 @@
-import { useState, useEffect } from "react";
 import { InputCheckbox } from "../InputCheckbox";
 import { TransactionPaneComponent } from "./types";
 
 export const TransactionPane: TransactionPaneComponent = ({
   transaction,
   loading,
-  setTransactionApproval: consumerSetTransactionApproval,
+  setTransactionApproval,
 }) => {
-  const [approved, setApproved] = useState(transaction.approved);
-
-  // bug 2 -- update changes 
-  useEffect(() => {
-    setApproved(transaction.approved);
-  }, [transaction.approved]);
+  console.log("Rendering TransactionPane for transaction:", transaction);
 
   const handleCheckboxChange = async (newValue: boolean) => {
+    console.log(`Checkbox changed for transactionId=${transaction.id}, newValue=${newValue}`);
 
-    setApproved(newValue);
+    await setTransactionApproval({
+      transactionId: transaction.id,
+      newValue,
+    });
 
-    try {
-      await consumerSetTransactionApproval({
-        transactionId: transaction.id,
-        newValue,
-      });
-    } catch (error) {
-      // Rollback if the request fails
-      setApproved(!newValue);
-    }
+    console.log(`Transaction approval updated for transactionId=${transaction.id}`);
   };
-
-
-
 
   return (
     <div className="RampPane">
@@ -43,8 +30,8 @@ export const TransactionPane: TransactionPaneComponent = ({
       </div>
       <InputCheckbox
         id={transaction.id}
-        checked={approved}
-        // disabled={loading} 
+        checked={transaction.approved}
+        disabled={loading}
         onChange={handleCheckboxChange}
       />
     </div>
@@ -54,4 +41,4 @@ export const TransactionPane: TransactionPaneComponent = ({
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
-}); 
+});

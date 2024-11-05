@@ -14,6 +14,7 @@ export function App() {
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
 
+
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
     [paginatedTransactions, transactionsByEmployee]
@@ -39,6 +40,7 @@ export function App() {
 
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
+      console.log("Current Transactions:", transactions);
       loadAllTransactions()
     }
   }, [employeeUtils.loading, employees, loadAllTransactions])
@@ -60,6 +62,8 @@ export function App() {
             value: item.id,
             label: item === EMPTY_EMPLOYEE ? "All Employees" : `${item.firstName} ${item.lastName}`,
           })}
+
+
           onChange={async (newValue) => {
             // Bug 3 - check if the id is null or empty employee
             if (newValue === null || newValue.id === EMPTY_EMPLOYEE.id) {
@@ -75,7 +79,10 @@ export function App() {
         <div className="RampBreak--l" />
 
         <div className="RampGrid">
-          <Transactions transactions={transactions} />
+          <Transactions 
+          transactions={transactions}
+          
+           />
 
           {paginatedTransactions?.data && paginatedTransactions?.nextPage !== null && transactionsByEmployee === null && (
             <button
